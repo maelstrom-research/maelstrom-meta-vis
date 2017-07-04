@@ -26,18 +26,17 @@ requireNamespace("DT", quietly=TRUE) # for dynamic tables
 
 # ---- declare-globals ---------------------------------------------------------
 # link to the source of the location mapping
-# path_input <- "./data-unshared/raw/Location_Map_Detailed_2017-05-23.csv"
-path_input <- "./legacy/memory-scale-coverage-IALSA.csv"
-# path_input <- "./legacy/processing-speed-coverage.csv"
+# path_input <- "./data-unshared/raw/SearchVariables.csv"
+path_input <- "./data-unshared/raw/coverage.csv"
 # test whether the file exists / the link is good
 testit::assert("File does not exist", base::file.exists(path_input))
 # declare where you will store the product of this script
 # path_save <- "./data-unshared/derived/memory"
-path_save <- "./data-unshared/derived/processing-speed"
+path_save <- "./data-unshared/derived/dto-1"
 # See definitions of commonly  used objects in:
 source("./manipulation/object-glossary.R")   # object definitions
-path_save_meta <- "./data-unshared/meta/perceptual_spead-live.csv"
-path_input_meta <- "./data-public/meta/perceptual_speed-dead.csv"
+path_save_meta <- "./data-unshared/meta/coverage-live.csv"
+path_input_meta <- "./data-public/meta/coverage-dead.csv"
 
 # path_save_meta <- "./data-unshared/meta/memory-live.csv"
 # path_input_meta <- "./data-public/meta/memory-dead.csv"
@@ -46,12 +45,13 @@ path_input_meta <- "./data-public/meta/perceptual_speed-dead.csv"
 # functions, the use of which is localized to this script
 
 # ---- load-data ---------------------------------------------------------------
-ds <- readr::read_csv(path_input) %>% as.data.frame() 
+ds <- readr::read_csv(path_input,skip = 2) %>% as.data.frame() 
 ds <- ds %>% tibble::as_tibble()
 # ds <- readr::read_csv(path_input) %>% as.data.frame() 
 
 # ---- inspect-data -----------------------------------------------------------
 ds %>% dplyr::glimpse()
+
 # ---- tweak-data -------------------------------------------------------------
 # identify the function of variables with respect to THIS wide-long tranformation
 variables_static <- common_stem
@@ -61,7 +61,7 @@ ds_long <- ds %>%
   tidyr::gather_("measure","value", variables_dynamic)
 
 ds_long %>% head()
-
+ds_long %>% glimpse()
 # save unique measure names 
 ds_long %>% 
   dplyr::distinct(measure) %>% 
