@@ -1,2 +1,2 @@
-# maelstrom-meta-vis
-Tools for creating information displays for exploring  harmonization potential using meta-data from Maelstrom Catalogue
+# maelstrom-link-scales
+Producing a flow to convert a table of related measures into a visualization. 
