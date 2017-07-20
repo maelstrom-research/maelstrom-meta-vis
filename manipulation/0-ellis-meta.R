@@ -27,16 +27,16 @@ requireNamespace("DT", quietly=TRUE) # for dynamic tables
 # ---- declare-globals ---------------------------------------------------------
 # link to the source of the location mapping
 # path_input <- "./data-unshared/raw/SearchVariables.csv"
-path_input <- "./data-unshared/raw/coverage.csv"
+path_input <- "./data-unshared/raw/IALSA-measures-meta.csv"
 # test whether the file exists / the link is good
 testit::assert("File does not exist", base::file.exists(path_input))
 # declare where you will store the product of this script
 # path_save <- "./data-unshared/derived/memory"
-path_save <- "./data-unshared/derived/dto-1"
+path_save <- "./data-unshared/derived/dto-meta-1"
 # See definitions of commonly  used objects in:
-source("./manipulation/object-glossary.R")   # object definitions
-path_save_meta <- "./data-unshared/derived/coverage-cognitive-live.csv"
-path_input_meta <- "./data-public/meta/coverage-cognitive-dead.csv"
+# source("./manipulation/object-glossary.R")   # object definitions
+# path_save_meta <- "./data-unshared/derived/coverage-cognitive-live.csv"
+# path_input_meta <- "./data-public/meta/coverage-cognitive-dead.csv"
 
 # path_save_meta <- "./data-unshared/meta/memory-live.csv"
 # path_input_meta <- "./data-public/meta/memory-dead.csv"
@@ -45,15 +45,24 @@ path_input_meta <- "./data-public/meta/coverage-cognitive-dead.csv"
 # functions, the use of which is localized to this script
 
 # ---- load-data ---------------------------------------------------------------
-ds <- readr::read_csv(path_input,skip = 2) %>% as.data.frame() 
+ds <- readr::read_csv(path_input) %>% as.data.frame() 
+# ds <- readr::read_csv(path_input,skip = 2) %>% as.data.frame() 
 ds <- ds %>% tibble::as_tibble()
 # ds <- readr::read_csv(path_input) %>% as.data.frame() 
 
 # ---- inspect-data -----------------------------------------------------------
 ds %>% dplyr::glimpse()
-convert_to_ascii <- function( x ) {
-  iconv(x, "latin1", "ASCII//TRANSLIT")
-}
+
+ds %>% 
+  dplyr::distinct(table) 
+
+ds %>% 
+  dplyr::mutate(
+    study = gsub("(\\.+)_(\\?+)","\\1", table)
+  ) %>% 
+  dplyr::distinct(table, study)
+
+
 # ---- tweak-data -------------------------------------------------------------
 # identify the function of variables with respect to THIS wide-long tranformation
 variables_static <- common_stem
@@ -87,6 +96,3 @@ ds_long <- ds_long %>%
 # ---- save-to-disk ----------------
 saveRDS(ds_long, paste0(path_save,".rds"))
 readr::write_csv(ds_long, paste0(path_save,".csv"))
-
-
-
