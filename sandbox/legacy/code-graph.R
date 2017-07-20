@@ -1,7 +1,8 @@
 # read table from J Bergeron
 # REMOVE all dashes in names of either constructs or studies
  
-toto<-read.table(file="C:\\Users\\ghislain\\Documents\\cognitive-scales-IALSA\\Processing speed - coverage.txt",
+# toto<-read.table(file="C:\\Users\\ghislain\\Documents\\cognitive-scales-IALSA\\Processing speed - coverage.txt",
+toto<-read.table(file="./sandbox/legacy/processing-speed-coverage.txt",
                  header=T,sep="\t")
 
 # Exclude constructs with only one study 
@@ -15,7 +16,7 @@ library(sand)
 # Within each construct, generate edges between studies
 
 # For Choice.Reaction.Time, edges are:
-CRT.g<-graph.full(5)
+CRT_g <-graph.full(5)
 V(CRT.g)$name<-c("ACTIVE","CaPS","CLS","OBAS","TILDA")
 plot(CRT.g)
 
@@ -40,7 +41,7 @@ V(WDST.g)$name<-c("CLS","DEAS","OBAS")
 plot(WDST.g)
 
 # create a single graph with edges having different weights
-titi<-rbind( get.edgelist(CRT.g),
+titi<-rbind( get.edgelist(CRT_g),
        get.edgelist(PC.g),
        get.edgelist(SRT.g),
        get.edgelist(SDMT.g),
@@ -78,7 +79,7 @@ plot(titi.bip, vertex.shape=ifelse(V(titi.bip)$type,"circle","circle"),
 # REMOVE all dashes in names of either constructs or studies
 ##############################################################
  
-memory<-read.csv(file="C:\\Users\\ghislain\\Documents\\cognitive-scales-IALSA\\Memory scale-coverage.csv",
+memory<-read.csv(file="./sandbox/legacy/memory-scale-coverage-IALSA.csv",
                  header=T,sep=",",na.strings="")
 memory<-memory[,-c(2,3)]
 which(apply(memory[,-1]!=0,2,sum)==1)    # to identify constructs used by only 1 study

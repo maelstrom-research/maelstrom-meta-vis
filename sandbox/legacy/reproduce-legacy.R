@@ -28,7 +28,7 @@ requireNamespace("DT", quietly=TRUE) # for dynamic tables
 # link to the source of the location mapping
 # path_input <- "./data-unshared/raw/Location_Map_Detailed_2017-05-23.csv"
 # path_input <- "./sandbox/legacy/memory-scale-coverage-IALSA.csv"
-path_input <- "./legacy/processing-speed-coverage.csv"
+path_input <- "./sandbox/legacy/processing-speed-coverage.csv"
 # test whether the file exists / the link is good
 testit::assert("File does not exist", base::file.exists(path_input))
 # declare where you will store the product of this script
@@ -55,6 +55,8 @@ ds <- ds %>% tibble::as_tibble()
 
 # ---- inspect-data -----------------------------------------------------------
 ds %>% dplyr::glimpse()
+
+
 # ---- tweak-data -------------------------------------------------------------
 # identify the function of variables with respect to THIS wide-long tranformation
 variables_static <- common_stem
@@ -68,6 +70,9 @@ ds_long %>% head()
 # save unique measure names 
 ds_long %>% 
   dplyr::distinct(measure) %>% 
+  dplyr::mutate(
+    
+  ) %>% 
   readr::write_csv(path_save_meta) 
 # edit the meta data spreadsheed manually and save it in data-public/meta
 ds_meta  <- readr::read_csv(path_input_meta)
