@@ -58,69 +58,39 @@ read_chunk("./reports/coverage-cognitive/coverage-cognitive.R")
 ```{r load-sources, echo=echoChunks, message=FALSE}
 ```
 
-
-# Glossary
-Review object definitions to assist you in reading the report. 
 <!-- Load any Global functions and variables declared in the R file.  Suppress the output. --> 
-```{r declare-globals, echo=T, results='asis', message=FALSE, warning=F}
+```{r declare-globals, echo=FALSE, results='hide', message=FALSE, warning=F}
 ```
 
-Review functions definitions to assist you in reading the report.
-```{r utility-functions, echo=T, results='show', message=FALSE}
+
+```{r utility-functions,echo=FALSE, results='hide', message=FALSE}
 ```
 
 <!-- Declare any global functions specific to a Rmd output.  Suppress the output. --> 
-```{r, echo=echoChunks, message=FALSE}
+```{r, echo=echoChunks,echo=FALSE, results='hide', message=FALSE}
 #Put code in here.  It doesn't call a chunk in the codebehind file.
 ```
 
-# Data Origin
-
-Using Maelstrom website, we obtain a `coverage table` for constructs of cognitive functioning and import in into R environment:
-
-![](../../reports/coverage-cognitive/data-origin/4-data-origin.gif)
-
-To examine the expanded origin of the data at your own pace, please consult [data-origin.pdf][data-origin.pdf]
-
-# Load Data
 
 <!-- Load the datasets.   -->
-```{r load-data, echo=TRUE, results='show', message=FALSE}
+```{r load-data, echo=FALSE, results='hide', message=FALSE}
 ```
 
 <!-- Inspect the datasets.   -->
-```{r inspect-data, echo=TRUE, results='show', message=FALSE}
+```{r inspect-data, echo=FALSE, results='hide', message=FALSE}
 ```
-![](../../reports/coverage-cognitive/data-origin/0-images/step-09.png)
 
-# Convert to long
 <!-- Tweak the datasets.   -->
-```{r tweak-data-1, echo=T, results='show', message=FALSE, warning=F}
-```
-![](../../reports/coverage-cognitive/data-origin/0-images/step-10a.png)
-
-# Add domain structure 
-
-```{r tweak-data-2, echo=T, results='show', message=FALSE, warning=F}
+```{r tweak-data-1, echo=FALSE, results='hide',message=FALSE, warning=F}
 ```
 
-![](../../reports/coverage-cognitive/data-origin/0-images/step-10.png)
-
-# Compute counts
-```{r tweak-data-3, echo=T, results='show', message=FALSE, warning=F}
+```{r tweak-data-2, echo=FALSE, results='hide', message=FALSE, warning=F}
 ```
-![](../../reports/coverage-cognitive/data-origin/0-images/step-11.png)
-![](../../reports/coverage-cognitive/six-questions/3-six-questions.gif)
 
+```{r tweak-data-3, echo=FALSE, results='hide', message=FALSE, warning=F}
+```
 
-To examine each slide at your own pace, please consult [six-questions.pdf][six-questions.pdf]
-
-
-
-
-# Display results
-
-A [dedicated report](barebones) containing these two tables existes for the ease of handling. 
+To remember where the data comes from please review [data origin report]() or flip through [data origin slides][data-origin.pdf] and ask [six-questions][six-questions.pdf] about each cognitive measure. 
 
 
 > The columns with numbers give answers to specific questions:  
@@ -132,20 +102,25 @@ A [dedicated report](barebones) containing these two tables existes for the ease
   - `measures_s_d` - how many measures does this study have in this domain?   
   - `items_m`      - how many items does this measure contain?
 
+![](../../reports/coverage-cognitive/six-questions/3-six-questions.gif) 
+
 ```{r basic-table, echo=F, results='show', message=FALSE}
 ```
 
+The same table as above is presented below in an alternative interface.   
 
-A [dedicated report][barebones] containing these two tables existes for the ease of handling. 
+```{r basic-table-2, echo=F, results='show', message=FALSE}
+```
+
 
 # Session Info
-
-To reproduces this report, please follow the instructions displayed at the main [`README.me`][main-readme] of our github project
-
 ```{r session-info, echo=FALSE}
 cat("Report rendered by", Sys.info()["user"], "at", strftime(Sys.time(), "%Y-%m-%d, %H:%M %z"))
 sessionInfo()
 ```
 
 
-[barebones]:
+[data-origin.pdf]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/2f4f3280274eb25d7aeaedd465fffaefd3a56c9e/reports/coverage-cognitive/data-origin/1-data-origin.pdf
+
+[six-questions.pdf]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/2f4f3280274eb25d7aeaedd465fffaefd3a56c9e/reports/coverage-cognitive/six-questions/1-six-questions.pdf
+

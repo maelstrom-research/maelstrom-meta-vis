@@ -14,162 +14,163 @@ source("./scripts/graphing/graph-presets.R") # font and color conventions
 library(ggplot2) #For graphing
 library(dplyr)
 library(magrittr) #Pipes
-requireNamespace("readxl")
-
 requireNamespace("knitr", quietly=TRUE)
 requireNamespace("scales", quietly=TRUE) #For formating values in graphs
 requireNamespace("RColorBrewer", quietly=TRUE)
 requireNamespace("dplyr", quietly=TRUE)
 requireNamespace("DT", quietly=TRUE) # for dynamic tables
-# requireNamespace("plyr", quietly=TRUE)
-# requireNamespace("reshape2", quietly=TRUE) #For converting wide to long
-# requireNamespace("mgcv, quietly=TRUE) #For the Generalized Additive Model that smooths the longitudinal graphs.
 
 # ---- declare-globals ---------------------------------------------------------
-# link to the source of the location mapping
-# path_input <- "./data-unshared/raw/SearchVariables.csv"
+# link to the csv file containing the coverage table
 path_input <- "./data-unshared/raw/coverage-cognitive.csv"
-# path_input <- "./data-unshared/raw/coverage-memory.csv"
-# path_input <- "./data-unshared/raw/coverage-memory-dce.csv"
 # test whether the file exists / the link is good
 testit::assert("File does not exist", base::file.exists(path_input))
-# declare where you will store the product of this script
-# path_save <- "./data-unshared/derived/memory"
+# declare where you will store the product of this script (prepared data set)
 path_save <- "./data-unshared/derived/dto-1"
 # See definitions of commonly  used objects in:
 source("./manipulation/object-glossary.R")   # object definitions
+# indicate a place to store meta data extracted from the coverage table
 path_save_meta <- "./data-unshared/derived/coverage-cognitive-live.csv"
+# path to csv that maps cognitive measures to domains (built from path_save_meta)
 path_input_meta <- "./data-public/meta/coverage-cognitive-dead.csv"
 
-# path_save_meta <- "./data-unshared/meta/memory-live.csv"
-# path_input_meta <- "./data-public/meta/memory-dead.csv"
 
 # ---- utility-functions ----------------------------------------------------- 
-# functions, the use of which is localized to this script
+# convert a character variance into ASCII encoding
 convert_to_ascii <- function( x ) {
   iconv(x, "latin1", "ASCII//TRANSLIT")
 }
 # ---- load-data ---------------------------------------------------------------
-ds <- readr::read_csv(path_input,skip = 2) %>% as.data.frame() 
-ds <- ds %>% tibble::as_tibble()
-# ds <- readr::read_csv(path_input) %>% as.data.frame() 
+# load the convergence table and give it a generic name
+ds <- readr::read_csv(path_input,skip = 2) %>% tibble::as_tibble()
 
 # ---- inspect-data -----------------------------------------------------------
-ds %>% dplyr::glimpse()
 
-# ---- tweak-data -------------------------------------------------------------
+
+# ---- tweak-data-1 -------------------------------------------------------------
 # identify the function of variables with respect to THIS wide-long tranformation
-variables_static <- common_stem_dce
-# variables_static <- common_stem
-variables_dynamic <- setdiff(colnames(ds), variables_static)
-# tranform
-ds_long <- ds %>% 
-  tidyr::gather_("measure_label","value", variables_dynamic) %>% 
-  dplyr::mutate(
-    measure_label = gsub("\\'s",'s',measure_label), # some apostrophes are apostrophes
-    measure_label = convert_to_ascii(measure_label), # others are single quote
-    measure_label = gsub("a\\?\\?",'',measure_label) # replace
-  ) %>% 
-  # dplyr::select(-Start, -End) %>% 
-  dplyr::arrange(Study)
+variables_static <- c("Study","Start",	"End")
+# all other variables will be considered "dynamic", i.e. moving during elongation
+variables_dynamic <- setdiff(colnames(ds), variables_static) # 209 items
 
+# tranform from wide to long with respect to measure 
+ds_long <- ds %>% 
+  # items_m - how many items does this measure contain? 
+  tidyr::gather_("measure","items_m", variables_dynamic) %>% 
+  # correct for troublesome characters in strings
+  dplyr::mutate(
+    measure = gsub("\\'s",'s',measure), # some apostrophes are apostrophes
+    measure = convert_to_ascii(measure), # others are single quote
+    measure = gsub("a\\?\\?",'',measure) # replace
+  ) %>% 
+  # dplyr::select(-Start, -End) %>% # we may not want this
+  dplyr::arrange(Study) # order by study
+# make the names of the variables lowercase for ease of typing
+names(ds_long) <- tolower(names(ds_long))
+# basic inspection
 ds_long %>% head()
 ds_long %>% glimpse()
 
+# ---- tweak-data-2 -------------------------------------------------------------
 # save unique measure names / extract meta data
 ds_long %>%
-  dplyr::distinct(measure_label) %>%
-  dplyr::arrange(measure_label) %>% 
+  dplyr::distinct(measure) %>%
+  dplyr::arrange(measure) %>% 
   readr::write_csv(path_save_meta)
 
-## edit the meta data spreadsheed manually and save it in data-public/meta
+# edit the meta data spreadsheed manually and save it in `./data-public/meta/`
+# ...
+# import the augmented meta data CONTAINING DOMAIN MAPPING
 ds_meta  <- readr::read_csv(path_input_meta)
 
 # augemnt the long file with meta data / attach meta data
 ds_long <- ds_long %>%
-  dplyr::full_join(ds_meta, by = "measure_label" ) %>%
+  dplyr::full_join(ds_meta, by = "measure" ) %>%
   tibble::as_tibble() %>%  
-  dplyr::filter(!value==0) %>% 
-  dplyr::arrange(Study)
-# 
-names(ds_long) <- tolower(names(ds_long))
+  dplyr::filter(!items_m==0) %>% 
+  dplyr::arrange(study)
 
-# ---- basic-table ------------------------------------------
+# basic inspection
+ds_long %>% head()
+ds_long %>% glimpse()
+
+# ---- tweak-data-3 ---------------------------------------------------------
+# Each of the computed columns will provide an answer to a specific question:  
+# `measures_d`   - how many measures does this domain have?   
+# `studies_d`    - how many studies have at least one measure in this domain?  
+# `studies_m`    - how many studies have this measure?  
+# `measures_s`   - how many measures does this study have?    
+# `measures_s_d` - how many measures does this study have in this domain?   
+# `items_m`      - how many items does this measure contain?
+
+# count measues, studies, domains and their relationships
 d <- ds_long %>% 
-  dplyr::rename(
-    measure = measure_label,
-    items_m = value
-    
-  ) %>%
-  dplyr::group_by(measure) %>% # n_studies THAT HAVE THIS MEASURE
+  # how many studies have this measure?  
+  dplyr::group_by(measure) %>% 
   dplyr::mutate(studies_m = length(!is.na(study))) %>% 
   dplyr::ungroup() %>% 
-  dplyr::group_by(study) %>%  # n_measures THAT THIS STUDY HAS
+  # how many measures does this study have? 
+  dplyr::group_by(study) %>%  
   dplyr::mutate(measures_s = length(!is.na(measure))) %>% 
   dplyr::ungroup() %>% 
-  dplyr::group_by(study, domain) %>%  # n_measures THAT THIS STUDY HAS IN THIS DOMAIN
+  # how many measures does this study have in this domain?  
+  dplyr::group_by(study, domain) %>%  
   dplyr::mutate(measures_s_d = length(!is.na(measure))) %>% 
   dplyr::ungroup() %>% 
-  
+  # how many measures does this domain have? 
+  # how many studies have at least one measure in this domain?  
   dplyr::group_by(domain) %>% 
   dplyr::mutate(
     measures_d = length(!is.na(unique(measure)))
-     # unique_measure =  unique(measure) %>% !is.na() %>% length()
-    ,studies_d  = length(!is.na(unique(study)))
-    ) %>% 
-  dplyr::ungroup() %>% 
-  dplyr::mutate(
-    # m = unique_measures,
-    # s = unique_studies,
-    # measures_d = 
-    # studies_d =
-      
+   ,studies_d  = length(!is.na(unique(study)))
   ) %>% 
-  # dplyr::select(study,measure,domain,n_items, n_studies, n_measures, domain_size)
-  # dplyr::select(study,domain,measure,n_items, n_studies, n_measures,n_measures_domain, domain_size)
+  dplyr::ungroup() %>% 
+  # make factors for easier handling
+  dplyr::mutate(
+     study   = factor(study)
+    ,measure = factor(measure)
+    ,domain  = factor(domain)
+  ) %>%
+  # order the variables for easier reference
   dplyr::select(
-    # study,domain,measure,n_items, n_studies, n_measures,n_measures_domain, domain_size
     domain,
-    # unique_measures,unique_studies,
-    # m,s,
     measures_d,studies_d,
-    # measure, n_studies,
     measure, studies_m,
     study, measures_s,
     measures_s_d,
     items_m
   )
 
+
+# ---- basic-table ------------------------------------------
 d %>%
-  dplyr::mutate(
-    study = factor(study)
-    ,measure = factor(measure)
-    ,domain = factor(domain)
-  ) %>% 
-  # dplyr::select(-measure) %>% 
+  DT::datatable(
+      class      = 'cell-border stripe',
+      rownames   = FALSE,
+      style      = "bootstrap",
+      extensions = "ColReorder",
+       options   = list(
+         pageLength = 6
+        ,autoWidth  = TRUE
+        ,colReorder = TRUE
+          ),
+      filter     = "top"
+    )
+
+# ---- basic-table-2 ------------------------------------------
+d %>%
     DT::datatable(
-      rownames = FALSE,
-      class     = 'cell-border stripe',
-      filter    = "top",
-      extensions = 'Buttons', 
-      options = list(
-        # Buttons
-         dom = 'Bfrtip' 
-        ,buttons =list(list(extend = 'colvis'))
-        # General
-        # ,pageLength = 6
-        # ,autoWidth = TRUE
+      style = "bootstrap",
+      extensions = c('ColReorder',"KeyTable","Buttons")
+      ,options = list(
+        colReorder = list(realtime = FALSE),
+        KeyTable   = list(keys = TRUE),
+        dom = "Bfrtip",
+        buttons = list(list(extend = 'colvis'),"csv")
         )
     )
 
-
 # ---- basic-graph --------------------------------------------------------------
-# Questions that the numbers in columns answer:
-# items_m = how many items are were there recorded for this MEASURE have been 
-# n_studies = how many studies have this measure?
-# n_measures = how many cognitive measures does this study have? 
-# n_measures_domain = how many cognitive measures does this study have in this domain?
-# domain_size = how many distinct measures does this domain has
 
 # Sonata form report structure
 # ---- dev-a-0 ---------------------------------
@@ -203,8 +204,9 @@ d %>%
 
 # ---- publish ---------------------------------------
 path_report_1 <- "./reports/coverage-cognitive/coverage-cognitive.Rmd"
+path_report_2 <- "./reports/coverage-cognitive/coverage-cognitive-barebone.Rmd"
 
-allReports <- c(path_report_1)
+allReports <- c(path_report_1, path_report_2)
 
 pathFilesToBuild <- c(allReports)
 testit::assert("The knitr Rmd files should exist.", base::file.exists(pathFilesToBuild))
