@@ -152,9 +152,9 @@ sessionInfo()
 ```
 
 
-[data-origin.pdf]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/2f4f3280274eb25d7aeaedd465fffaefd3a56c9e/reports/coverage-cognitive/data-origin/1-data-origin.pdf
+[data-origin.pdf]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/master/reports/coverage-cognitive/data-origin/1-data-origin.pdf
 
-[six-questions.pdf]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/2f4f3280274eb25d7aeaedd465fffaefd3a56c9e/reports/coverage-cognitive/six-questions/1-six-questions.pdf
+[six-questions.pdf]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/master/reports/coverage-cognitive/six-questions/1-six-questions.pdf
 
 [coverage-cognitive]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/master/reports/coverage-cognitive/coverage-cognitive.html
 
