@@ -2,6 +2,8 @@
 
 Visualizaing meta-data from Maelstrom catalogue
 
+To reproduce the reports, please clone the repository and follow the instructions in the [data origin report][coverage-cognitive]. 
+
 
 ### Reports
 - [data origin report][coverage-cognitive] - describes how the data travels from Maelstrom website to the table of results. 
