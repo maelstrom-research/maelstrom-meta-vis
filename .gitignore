@@ -31,6 +31,14 @@ devtools.zip
 /data-unshared/*
 /data/unshared/*
 
+/reports/coverage-cognitive/data-origin/*.*
+/reports/coverage-cognitive/data-origin/2-png/*.*
+!/reports/coverage-cognitive/data-origin/1-data-origin.pdf
+
+
+/reports/coverage-cognitive/six-questions/*.*
+/reports/coverage-cognitive/six-questions/1-six-questions/*.*
+!/reports/coverage-cognitive/six-questions/1-six-questions.pdf
 
 sandbox/network-workshop/*
 # Dataset Exceptions
