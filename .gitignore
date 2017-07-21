@@ -40,6 +40,9 @@ devtools.zip
 /reports/coverage-cognitive/six-questions/1-six-questions/*.*
 !/reports/coverage-cognitive/six-questions/1-six-questions.pdf
 
+!/reports/coverage-cognitive/data-origin/4-data-origin.gif
+!reports/coverage-cognitive/six-questions/3-six-questions.gif
+
 sandbox/network-workshop/*
 # Dataset Exceptions
 !utility/package-dependency-list.csv
