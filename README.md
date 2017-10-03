@@ -21,7 +21,7 @@ To reproduce the reports, please clone the repository and follow the instruction
 
 
 
-[data-origin.pdf]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/2f4f3280274eb25d7aeaedd465fffaefd3a56c9e/reports/coverage-cognitive/data-origin/1-data-origin.pdf
+[data-origin.pdf]:https://rawgit.com/maelstrom-research/maelstrom-meta-vis/master/reports/coverage-cognitive/data-origin/1-data-origin.pdf
 
 [data-origin.gif]:https://raw.githubusercontent.com/maelstrom-research/maelstrom-meta-vis/master/reports/coverage-cognitive/data-origin/4-data-origin.gif
 
